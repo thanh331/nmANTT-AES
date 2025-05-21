@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES File Encryption/Decryption</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 class="title">Mã hóa/Giải mã file với AES</h1>
+            <p class="subtitle">Sử dụng thuật toán AES-256 CBC để bảo vệ dữ liệu của bạn</p>
+            
+            {% if error %}
+                <div class="alert error">{{ error }}</div>
+            {% endif %}
+            
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="key">Mã khóa (bất kỳ độ dài nào):</label>
+                    <input type="text" id="key" name="key" placeholder="Nhập mã khóa của bạn" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="file">Chọn file:</label>
+                    <input type="file" id="file" name="file" required>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" name="action" value="encrypt" class="btn encrypt">Mã hóa</button>
+                    <button type="submit" name="action" value="decrypt" class="btn decrypt">Giải mã</button>
+                </div>
+            </form>
+            
+            <div class="info">
+                <h3>Hướng dẫn sử dụng:</h3>
+                <ol>
+                    <li>Nhập mã khóa (có thể là bất kỳ chuỗi nào)</li>
+                    <li>Chọn file cần mã hóa hoặc giải mã</li>
+                    <li>Nhấn nút "Mã hóa" hoặc "Giải mã"</li>
+                    <li>File kết quả sẽ được tải xuống tự động</li>
+                </ol>
+                
+                <div class="note">
+                    <strong>Lưu ý:</strong> Để giải mã file, bạn phải sử dụng đúng mã khóa đã dùng để mã hóa.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

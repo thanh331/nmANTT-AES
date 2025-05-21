@@ -1,0 +1,339 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Encryption/Decryption Tool</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            background-color: white;
+        }
+        .header {
+            background-color: #e9f7ef;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .header img {
+            max-height: 60px;
+            margin-bottom: 10px;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .key-display {
+            word-break: break-all;
+            font-family: monospace;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AES Encryption/Decryption Tool</h1>
+            <p class="text-muted">Secure your data with AES encryption</p>
+        </div>
+
+        <ul class="nav nav-tabs" id="encryptionTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="encrypt-tab" data-bs-toggle="tab" 
+                        data-bs-target="#encrypt" type="button" role="tab" 
+                        aria-controls="encrypt" aria-selected="true">Encrypt</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="decrypt-tab" data-bs-toggle="tab" 
+                        data-bs-target="#decrypt" type="button" role="tab" 
+                        aria-controls="decrypt" aria-selected="false">Decrypt</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="encryptionTabsContent">
+            <!-- Encrypt Tab -->
+            <div class="tab-pane fade show active" id="encrypt" role="tabpanel" aria-labelledby="encrypt-tab">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Encrypt Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="encrypt-form">
+                            <div class="mb-3">
+                                <label for="encrypt-key" class="form-label">Encryption Key (optional)</label>
+                                <input type="text" class="form-control" id="encrypt-key" 
+                                       placeholder="Leave blank to generate a random key">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="key-length" class="form-label">Key Length</label>
+                                <select class="form-select" id="key-length">
+                                    <option value="16">128 bits</option>
+                                    <option value="24">192 bits</option>
+                                    <option value="32">256 bits</option>
+                                </select>
+                            </div>
+                            
+                            <ul class="nav nav-tabs mb-3" id="encryptInputTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="text-encrypt-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#text-encrypt" type="button" role="tab">Text</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="file-encrypt-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#file-encrypt" type="button" role="tab">File</button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="encryptInputTabsContent">
+                                <div class="tab-pane fade show active" id="text-encrypt" role="tabpanel">
+                                    <div class="mb-3">
+                                        <label for="text-to-encrypt" class="form-label">Text to Encrypt</label>
+                                        <textarea class="form-control" id="text-to-encrypt" rows="5" 
+                                                  placeholder="Enter text to encrypt"></textarea>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="file-encrypt" role="tabpanel">
+                                    <div class="mb-3">
+                                        <label for="file-to-encrypt" class="form-label">File to Encrypt</label>
+                                        <input type="file" class="form-control" id="file-to-encrypt">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Encrypt</button>
+                        </form>
+                        
+                        <div id="encrypt-result" class="result-box mt-4 d-none">
+                            <h5>Encryption Results</h5>
+                            <div class="alert alert-success">
+                                <strong>Success!</strong> Your data has been encrypted.
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Encryption Key (Save this to decrypt later)</label>
+                                <div id="key-display" class="key-display"></div>
+                                <button id="copy-key" class="btn btn-sm btn-secondary mt-2">Copy Key</button>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Initialization Vector (IV)</label>
+                                <div id="iv-display" class="key-display"></div>
+                                <button id="copy-iv" class="btn btn-sm btn-secondary mt-2">Copy IV</button>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Encrypted Result</label>
+                                <div id="encrypted-result" class="key-display"></div>
+                            </div>
+                            
+                            <a id="download-encrypted" class="btn btn-success">Download Encrypted File</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decrypt Tab -->
+            <div class="tab-pane fade" id="decrypt" role="tabpanel" aria-labelledby="decrypt-tab">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Decrypt Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="decrypt-form">
+                            <div class="mb-3">
+                                <label for="decrypt-key" class="form-label">Encryption Key</label>
+                                <input type="text" class="form-control" id="decrypt-key" 
+                                       placeholder="Paste the encryption key" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="decrypt-iv" class="form-label">Initialization Vector (IV)</label>
+                                <input type="text" class="form-control" id="decrypt-iv" 
+                                       placeholder="Paste the initialization vector" required>
+                            </div>
+                            
+                            <ul class="nav nav-tabs mb-3" id="decryptInputTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="text-decrypt-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#text-decrypt" type="button" role="tab">Text</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="file-decrypt-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#file-decrypt" type="button" role="tab">File</button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="decryptInputTabsContent">
+                                <div class="tab-pane fade show active" id="text-decrypt" role="tabpanel">
+                                    <div class="mb-3">
+                                        <label for="text-to-decrypt" class="form-label">Text to Decrypt</label>
+                                        <textarea class="form-control" id="text-to-decrypt" rows="5" 
+                                                  placeholder="Paste encrypted text"></textarea>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="file-decrypt" role="tabpanel">
+                                    <div class="mb-3">
+                                        <label for="file-to-decrypt" class="form-label">File to Decrypt</label>
+                                        <input type="file" class="form-control" id="file-to-decrypt">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success">Decrypt</button>
+                        </form>
+                        
+                        <div id="decrypt-result" class="result-box mt-4 d-none">
+                            <h5>Decryption Results</h5>
+                            <div class="alert alert-success">
+                                <strong>Success!</strong> Your data has been decrypted.
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Decrypted Result</label>
+                                <div id="decrypted-result" class="key-display"></div>
+                            </div>
+                            
+                            <a id="download-decrypted" class="btn btn-success">Download Decrypted File</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Encrypt form handling
+            document.getElementById('encrypt-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('key', document.getElementById('encrypt-key').value);
+                formData.append('key_length', document.getElementById('key-length').value);
+                
+                // Check which input type is active
+                if (document.getElementById('text-encrypt').classList.contains('active') || 
+                    document.getElementById('text-encrypt').classList.contains('show')) {
+                    formData.append('text', document.getElementById('text-to-encrypt').value);
+                } else {
+                    const fileInput = document.getElementById('file-to-encrypt');
+                    if (fileInput.files.length > 0) {
+                        formData.append('file', fileInput.files[0]);
+                    }
+                }
+                
+                fetch('/encrypt', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+                    
+                    // Display results
+                    document.getElementById('encrypt-result').classList.remove('d-none');
+                    document.getElementById('key-display').textContent = data.key;
+                    document.getElementById('iv-display').textContent = data.iv;
+                    document.getElementById('encrypted-result').textContent = data.encrypted;
+                    
+                    // Set up download link
+                    const downloadLink = document.getElementById('download-encrypted');
+                    downloadLink.href = '/download/' + data.filename;
+                    downloadLink.download = data.filename;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during encryption.');
+                });
+            });
+            
+            // Decrypt form handling
+            document.getElementById('decrypt-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('key', document.getElementById('decrypt-key').value);
+                formData.append('iv', document.getElementById('decrypt-iv').value);
+                
+                // Check which input type is active
+                if (document.getElementById('text-decrypt').classList.contains('active') || 
+                    document.getElementById('text-decrypt').classList.contains('show')) {
+                    formData.append('text', document.getElementById('text-to-decrypt').value);
+                } else {
+                    const fileInput = document.getElementById('file-to-decrypt');
+                    if (fileInput.files.length > 0) {
+                        formData.append('file', fileInput.files[0]);
+                    }
+                }
+                
+                fetch('/decrypt', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+                    
+                    // Display results
+                    document.getElementById('decrypt-result').classList.remove('d-none');
+                    document.getElementById('decrypted-result').textContent = data.decrypted;
+                    
+                    // Set up download link
+                    const downloadLink = document.getElementById('download-decrypted');
+                    downloadLink.href = '/download/' + data.filename;
+                    downloadLink.download = data.filename;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during decryption.');
+                });
+            });
+            
+            // Copy buttons
+            document.getElementById('copy-key').addEventListener('click', function() {
+                copyToClipboard(document.getElementById('key-display').textContent);
+                alert('Key copied to clipboard!');
+            });
+            
+            document.getElementById('copy-iv').addEventListener('click', function() {
+                copyToClipboard(document.getElementById('iv-display').textContent);
+                alert('IV copied to clipboard!');
+            });
+            
+            function copyToClipboard(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+        });
+    </script>
+</body>
+</html>
